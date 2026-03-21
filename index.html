@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORACLE — Prediction Markets</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --white: #ffffff;
+    --ink: #111110;
+    --ink2: #555550;
+    --ink3: #999990;
+    --border: #e8e6e0;
+    --green: #1a7a4a;
+    --green-bg: #f0faf5;
+    --red: #c0392b;
+    --red-bg: #fdf5f4;
+    --accent: #1a7a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 60px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+
+  .logo em { font-style: italic; color: var(--green); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink3);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.2px;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+    background: var(--ink);
+    padding: 9px 22px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.75; }
+
+  /* HERO */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 100px 60px 80px;
+    text-align: center;
+  }
+
+  .hero-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: up 0.7s 0.1s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 68px;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    color: var(--ink);
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: up 0.7s 0.25s forwards;
+  }
+
+  .hero h1 em { font-style: italic; color: var(--ink3); }
+
+  .hero p {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--ink2);
+    max-width: 560px;
+    margin: 0 auto 44px;
+    opacity: 0;
+    animation: up 0.7s 0.4s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    opacity: 0;
+    animation: up 0.7s 0.55s forwards;
+  }
+
+  .btn-dark {
+    background: var(--ink);
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 13px 30px;
+    border-radius: 100px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-dark:hover { opacity: 0.7; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink2);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 13px 30px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-ghost:hover { border-color: var(--ink2); color: var(--ink); }
+
+  @keyframes up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    max-width: 100%;
+    opacity: 0;
+    animation: up 0.7s 0.65s forwards;
+  }
+
+  .stat-item {
+    padding: 40px 60px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 44px;
+    letter-spacing: -1px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-num .unit { font-size: 28px; }
+  .stat-label { font-size: 12px; color: var(--ink3); letter-spacing: 0.3px; }
+  .stat-change { font-size: 12px; color: var(--green); margin-top: 4px; }
+
+  /* SECTION WRAPPER */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 60px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* MARKETS */
+  .market-list { display: flex; flex-direction: column; gap: 1px; }
+
+  .market-row {
+    background: var(--white);
+    display: grid;
+    grid-template-columns: 1fr 120px 120px 100px;
+    align-items: center;
+    padding: 24px 32px;
+    gap: 24px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .market-row:hover { background: #fdfcf9; }
+
+  .market-row-title {
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .market-platform-tag {
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 5px;
+  }
+
+  .market-prob {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    text-align: right;
+  }
+
+  .prob-yes { color: var(--green); }
+  .prob-no { color: var(--red); }
+
+  .market-vol {
+    font-size: 13px;
+    color: var(--ink3);
+    text-align: right;
+  }
+
+  .market-trend {
+    font-size: 12px;
+    text-align: right;
+  }
+  .trend-up { color: var(--green); }
+  .trend-dn { color: var(--red); }
+
+  .market-header-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 120px 100px;
+    padding: 0 32px 12px;
+    gap: 24px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    font-weight: 500;
+  }
+
+  .col-right { text-align: right; }
+
+  /* NEWS */
+  .news-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .news-card {
+    background: var(--white);
+    padding: 36px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .news-card:hover { background: #fdfcf9; }
+  .news-card.featured { grid-column: span 2; }
+
+  .news-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .tag-c { color: var(--green); }
+  .tag-r { color: #c07a1a; }
+  .tag-p { color: #1a4a8a; }
+  .tag-s { color: #7a1a7a; }
+
+  .news-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .news-card.featured .news-headline { font-size: 30px; }
+
+  .news-meta { font-size: 12px; color: var(--ink3); }
+
+  /* EDUCATION */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .edu-card {
+    background: var(--white);
+    padding: 40px 36px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .edu-card:hover { background: #fdfcf9; }
+
+  .edu-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink3);
+    margin-bottom: 20px;
+  }
+
+  .edu-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 12px;
+    letter-spacing: -0.2px;
+  }
+
+  .edu-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink2);
+  }
+
+  .edu-level {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 24px;
+    color: var(--ink3);
+  }
+
+  /* PLATFORMS */
+  .platform-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .platform-card {
+    background: var(--white);
+    padding: 40px 36px;
+  }
+
+  .platform-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .platform-tagline {
+    font-size: 12px;
+    color: var(--ink3);
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .prow:last-of-type { border-bottom: none; }
+  .prow-label { color: var(--ink3); }
+  .prow-val { color: var(--ink); font-weight: 500; }
+  .prow-val.g { color: var(--green); }
+  .prow-val.r { color: var(--red); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 60px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .footer-logo em { font-style: italic; color: var(--green); }
+  .footer-desc { font-size: 13px; line-height: 1.7; color: var(--ink3); }
+
+  .footer-col-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 18px;
+  }
+
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 10px; }
+  .footer-links a { font-size: 13px; color: var(--ink2); text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--ink); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding: 24px 60px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink3);
+  }
+
+  /* FADE IN */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s, transform 0.6s;
+  }
+  .reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* DIVIDER */
+  hr { border: none; border-top: 1px solid var(--border); }
+
+  /* ── VIEW SYSTEM ────────────────────────────── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    background: var(--bg);
+  }
+  .page.active { display: block; }
+  #main-view.hidden { display: none; }
+
+  /* ARTICLE NAV (used in blog, lesson, newsletter views) */
+  .article-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 60px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 50;
+    backdrop-filter: blur(12px);
+  }
+
+  .back-link {
+    font-size: 13px;
+    color: var(--ink3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--ink); }
+
+  /* ARTICLE BODY */
+  .article-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 60px 120px;
+  }
+
+  .article-tag { margin-bottom: 16px; }
+
+  .article-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 42px;
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .article-meta-line {
+    font-size: 12px;
+    color: var(--ink3);
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-body {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--ink2);
+  }
+
+  .article-body p { margin-bottom: 24px; }
+
+  .article-body h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: var(--ink);
+    margin: 48px 0 16px;
+    letter-spacing: -0.3px;
+  }
+
+  .article-body strong { color: var(--ink); font-weight: 500; }
+
+  .article-body .callout {
+    background: var(--green-bg);
+    border-left: 3px solid var(--green);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 32px 0;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.7;
+  }
+
+  /* NEWSLETTER PAGE */
+  .newsletter-container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 100px 60px;
+    text-align: center;
+  }
+
+  .nl-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 24px;
+  }
+
+  .nl-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .nl-title em { font-style: italic; color: var(--ink3); }
+
+  .nl-desc {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--ink2);
+    margin-bottom: 48px;
+  }
+
+  .nl-form {
+    display: flex;
+    gap: 10px;
+    max-width: 440px;
+    margin: 0 auto 16px;
+  }
+
+  .nl-input {
+    flex: 1;
+    padding: 13px 18px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--white);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .nl-input:focus { border-color: var(--ink3); }
+  .nl-input::placeholder { color: var(--ink3); }
+
+  .nl-btn {
+    background: var(--ink);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 13px 24px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .nl-btn:hover { opacity: 0.75; }
+
+  .nl-success {
+    display: none;
+    color: var(--green);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .nl-perks {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 64px;
+    text-align: left;
+  }
+
+  .nl-perk {
+    background: var(--white);
+    padding: 32px 28px;
+  }
+
+  .nl-perk-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .nl-perk-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink3);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     MAIN VIEW
+══════════════════════════════════════════ -->
+<div id="main-view">
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">Or<em>a</em>cle</a>
+    <ul class="nav-links">
+      <li><a href="#markets" class="active">Markets</a></li>
+      <li><a href="#news">News</a></li>
+      <li><a href="#learn">Learn</a></li>
+      <li><a href="#platforms">Platforms</a></li>
+    </ul>
+    <a href="#newsletter" class="nav-cta">Subscribe</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Prediction Market Intelligence</div>
+    <h1>What does the<br>crowd <em>believe</em>?</h1>
+    <p>Real-time odds, news, and education across every major prediction market — from Polymarket to Kalshi.</p>
+    <div class="hero-actions">
+      <a href="#markets" class="btn-dark">Explore markets</a>
+      <a href="#learn" class="btn-ghost">How it works</a>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">$2.4<span class="unit">B</span></div>
+      <div class="stat-label">Total volume, all platforms</div>
+      <div class="stat-change">↑ 340% year over year</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">18k<span class="unit">+</span></div>
+      <div class="stat-label">Active markets right now</div>
+      <div class="stat-change">↑ 12% this month</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Platforms tracked</div>
+      <div class="stat-change">Updated in real-time</div>
+    </div>
+  </div>
+
+  <!-- MARKETS -->
+  <div class="section reveal" id="markets">
+    <div class="section-label">Live markets</div>
+    <div class="market-header-row">
+      <span>Question</span>
+      <span class="col-right">Probability</span>
+      <span class="col-right">Volume</span>
+      <span class="col-right">7d change</span>
+    </div>
+    <div class="market-list">
+      <a class="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
+        <div>
+          <div class="market-row-title">Will Bitcoin exceed $150,000 before end of 2025?</div>
+          <div class="market-platform-tag">Polymarket · Crypto</div>
+        </div>
+        <div class="market-prob prob-yes">73%</div>
+        <div class="market-vol">$28.4M</div>
+        <div class="market-trend trend-up">↑ +4.8%</div>
+      </a>
+      <a class="market-row" href="https://kalshi.com" target="_blank" rel="noopener">
+        <div>
+          <div class="market-row-title">Will the Fed cut rates at the March 2025 FOMC meeting?</div>
+          <div class="market-platform-tag">Kalshi · Macro</div>
+        </div>
+        <div class="market-prob prob-no">41%</div>
+        <div class="market-vol">$6.1M</div>
+        <div class="market-trend trend-dn">↓ −17%</div>
+      </a>
+      <a class="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
+        <div>
+          <div class="market-row-title">Will GPT-5 be released before July 2025?</div>
+          <div class="market-platform-tag">Polymarket · AI</div>
+        </div>
+        <div class="market-prob prob-yes">67%</div>
+        <div class="market-vol">$3.8M</div>
+        <div class="market-trend trend-up">↑ +5.3%</div>
+      </a>
+      <a class="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
+        <div>
+          <div class="market-row-title">Will there be a Gaza ceasefire agreement before June 2025?</div>
+          <div class="market-platform-tag">Polymarket · Geopolitics</div>
+        </div>
+        <div class="market-prob prob-yes">54%</div>
+        <div class="market-vol">$9.7M</div>
+        <div class="market-trend trend-up">↑ +2.1%</div>
+      </a>
+      <a class="market-row" href="https://kalshi.com" target="_blank" rel="noopener">
+        <div>
+          <div class="market-row-title">Will US CPI exceed 4% YoY in any month of 2025?</div>
+          <div class="market-platform-tag">Kalshi · Economy</div>
+        </div>
+        <div class="market-prob prob-no">22%</div>
+        <div class="market-vol">$2.2M</div>
+        <div class="market-trend trend-dn">↓ −1.2%</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- NEWS — rendered by JS from CONTENT.posts -->
+  <div class="section reveal" id="news">
+    <div class="section-label">Latest intelligence</div>
+    <div class="news-grid" id="news-grid"></div>
+  </div>
+
+  <!-- EDUCATION — rendered by JS from CONTENT.lessons -->
+  <div class="section reveal" id="learn">
+    <div class="section-label">Learn</div>
+    <div class="edu-grid" id="edu-grid"></div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="section reveal" id="platforms">
+    <div class="section-label">Platform comparison</div>
+    <div class="platform-grid">
+      <div class="platform-card">
+        <div class="platform-name">Polymarket</div>
+        <div class="platform-tagline">Decentralized · Polygon · Global</div>
+        <div class="prow"><span class="prow-label">Total volume</span><span class="prow-val g">$2.1B+</span></div>
+        <div class="prow"><span class="prow-label">Active markets</span><span class="prow-val">12,400+</span></div>
+        <div class="prow"><span class="prow-label">Currency</span><span class="prow-val">USDC</span></div>
+        <div class="prow"><span class="prow-label">US residents</span><span class="prow-val r">Restricted</span></div>
+        <div class="prow"><span class="prow-label">Fees</span><span class="prow-val">2% on winnings</span></div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">Kalshi</div>
+        <div class="platform-tagline">CFTC-regulated · USD · US legal</div>
+        <div class="prow"><span class="prow-label">Total volume</span><span class="prow-val g">$380M+</span></div>
+        <div class="prow"><span class="prow-label">Active markets</span><span class="prow-val">3,200+</span></div>
+        <div class="prow"><span class="prow-label">Currency</span><span class="prow-val">USD</span></div>
+        <div class="prow"><span class="prow-label">US residents</span><span class="prow-val g">Fully legal</span></div>
+        <div class="prow"><span class="prow-label">Fees</span><span class="prow-val">1–7% per contract</span></div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-name">Manifold</div>
+        <div class="platform-tagline">Community · Play money · Open</div>
+        <div class="prow"><span class="prow-label">Total volume</span><span class="prow-val">M$2.4B (play)</span></div>
+        <div class="prow"><span class="prow-label">Active markets</span><span class="prow-val">40,000+</span></div>
+        <div class="prow"><span class="prow-label">Currency</span><span class="prow-val">Mana (M$)</span></div>
+        <div class="prow"><span class="prow-label">US residents</span><span class="prow-val g">Open to all</span></div>
+        <div class="prow"><span class="prow-label">Fees</span><span class="prow-val">None</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-logo">Or<em>a</em>cle</div>
+      <p class="footer-desc">The cleanest way to follow prediction markets — odds, news, education, and platform data in one place.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Markets</div>
+      <ul class="footer-links">
+        <li><a href="#markets">Live odds</a></li>
+        <li><a href="#markets">Trending</a></li>
+        <li><a href="#markets">By category</a></li>
+        <li><a href="#markets">Arbitrage scanner</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Learn</div>
+      <ul class="footer-links">
+        <li><a href="#lesson/what-are-prediction-markets">Beginner guide</a></li>
+        <li><a href="#platforms">Platform reviews</a></li>
+        <li><a href="#learn">Research library</a></li>
+        <li><a href="#learn">Glossary</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Data</div>
+      <ul class="footer-links">
+        <li><a href="#">API docs</a></li>
+        <li><a href="#">Historical data</a></li>
+        <li><a href="#newsletter">Newsletter</a></li>
+        <li><a href="#">Discord</a></li>
+      </ul>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span>© 2026 Oracle</span>
+    <span>Not financial advice</span>
+  </div>
+
+</div><!-- end #main-view -->
+
+
+<!-- ══════════════════════════════════════════
+     BLOG / ARTICLE VIEW
+══════════════════════════════════════════ -->
+<div id="blog-view" class="page">
+  <div class="article-nav">
+    <a href="#" class="logo">Or<em>a</em>cle</a>
+    <a href="#news" class="back-link">← Back to News</a>
+  </div>
+  <div class="article-container">
+    <div id="article-content"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     LESSON VIEW
+══════════════════════════════════════════ -->
+<div id="learn-view" class="page">
+  <div class="article-nav">
+    <a href="#" class="logo">Or<em>a</em>cle</a>
+    <a href="#learn" class="back-link">← Back to Learn</a>
+  </div>
+  <div class="article-container">
+    <div id="lesson-content"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     NEWSLETTER VIEW
+══════════════════════════════════════════ -->
+<div id="newsletter-view" class="page">
+  <div class="article-nav">
+    <a href="#" class="logo">Or<em>a</em>cle</a>
+    <a href="#" class="back-link" id="nl-back">← Back</a>
+  </div>
+  <div class="newsletter-container">
+    <div class="nl-label">Weekly intelligence</div>
+    <h1 class="nl-title">The Oracle<br><em>Briefing</em></h1>
+    <p class="nl-desc">Every Monday: the most important prediction market moves, the signal behind the noise, and one deep-dive into a market that deserves attention.</p>
+    <form class="nl-form" id="nl-form">
+      <input class="nl-input" type="email" placeholder="your@email.com" required id="nl-email">
+      <button class="nl-btn" type="submit">Subscribe</button>
+    </form>
+    <div class="nl-success" id="nl-success">You're in. First issue lands Monday.</div>
+    <div class="nl-perks">
+      <div class="nl-perk">
+        <div class="nl-perk-title">Market moves</div>
+        <div class="nl-perk-desc">The week's biggest probability shifts, explained with context, not just the number.</div>
+      </div>
+      <div class="nl-perk">
+        <div class="nl-perk-title">Deep dive</div>
+        <div class="nl-perk-desc">One undertracked market or platform development we think deserves serious attention.</div>
+      </div>
+      <div class="nl-perk">
+        <div class="nl-perk-title">Data edge</div>
+        <div class="nl-perk-desc">Cross-platform discrepancies, arbitrage setups, and historical resolution data worth knowing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════
+// CMS DATA STORE — edit content here
+// ══════════════════════════════════════════════════
+const CONTENT = {
+
+  posts: [
+    {
+      id: 'btc-150k',
+      tag: 'Markets', tagClass: 'tag-c',
+      headline: 'Polymarket sees $28M in BTC price markets as crowd probability shifts to 73% YES on $150k target',
+      source: 'Oracle', time: '2 hours ago',
+      featured: true,
+      body: `
+        <p>Bitcoin's prediction market on Polymarket has crossed a significant threshold — over $28 million in combined volume across the BTC $150k contracts, with the YES side now sitting at 73% implied probability. That's a 12-point move in under two weeks.</p>
+        <h2>What's driving the shift</h2>
+        <p>The catalyst appears to be a combination of ETF inflow data and macro positioning. Spot Bitcoin ETF products recorded their largest single-week net inflow since February, pulling in approximately $1.4B. Simultaneously, the dollar index (DXY) has softened against a backdrop of mixed Fed signals, which historically correlates with BTC upward repricing.</p>
+        <div class="callout">At 73%, the market is pricing a 3-in-4 chance BTC hits $150k by December 31. For context, the same contract was at 48% in early January.</div>
+        <h2>How to read this signal</h2>
+        <p>Prediction market probabilities aren't just sentiment — they represent capital at risk. Someone willing to bet $1 at 73 cents to win a dollar has a real financial stake in that belief. This is why prediction markets consistently outperform polls and pundit forecasts: there's a cost to being wrong.</p>
+        <p>That said, the $150k contract is binary. The crowd could be right directionally but wrong on the specific threshold. Traders worth tracking are the large wallets that moved into YES positions in the $8–12M range over the last 72 hours — not retail, but structured positions.</p>
+        <h2>What to watch</h2>
+        <p><strong>FOMC meeting (March 19)</strong> — Any dovish pivot accelerates the thesis. <strong>ETF flows week of March 17</strong> — If inflows sustain above $800M, the 73% hold. A reversal below $400M would likely push odds back toward 60%.</p>
+      `
+    },
+    {
+      id: 'cftc-kalshi',
+      tag: 'Regulation', tagClass: 'tag-r',
+      headline: 'CFTC approves new event contract categories for Kalshi, expanding into climate and sports',
+      source: 'CoinDesk', time: '4 hours ago',
+      featured: false,
+      body: `
+        <p>The Commodity Futures Trading Commission has approved Kalshi's application to list event contracts in two new verticals: climate outcomes and professional sports results. The approval marks the broadest expansion of CFTC-regulated prediction markets in the agency's history.</p>
+        <h2>What this means practically</h2>
+        <p>Kalshi can now list contracts on outcomes like "Will average US summer temperature exceed X°F?" and "Will [Team] win the championship?" These aren't novelties — weather derivatives and sports betting markets each represent multi-billion dollar industries. Kalshi is now the only CFTC-regulated venue that can touch all of them.</p>
+        <div class="callout">The significance isn't just sports or weather — it's that the CFTC is defining a framework for what constitutes a legitimate "event contract." This creates a regulatory moat around Kalshi while signaling what Polymarket would need to do to re-enter the US market.</div>
+        <h2>The Polymarket dimension</h2>
+        <p>Polymarket has been effectively blocked from US users since its 2022 CFTC settlement. Every new Kalshi approval raises the compliance bar for a potential Polymarket return. The gap in regulatory legitimacy is widening, which could accelerate institutional capital flows toward Kalshi's more structured contracts.</p>
+      `
+    },
+    {
+      id: 'pm-research',
+      tag: 'Research', tagClass: 'tag-s',
+      headline: 'New paper: Prediction markets outperform expert forecasters by 18% across 1,200 geopolitical events',
+      source: 'SSRN', time: '6 hours ago',
+      featured: false,
+      body: `
+        <p>A new working paper analyzing 1,200 geopolitical forecasting events across a five-year period finds that prediction market prices outperform structured expert panels by 18 percentage points on Brier score — a metric that penalizes both overconfidence and underconfidence.</p>
+        <h2>Why this matters beyond the headline</h2>
+        <p>The 18% figure is the average. The gap widens dramatically for long-horizon events (6–18 months out) where expert forecasters showed consistent overconfidence, especially in domains with high media coverage. Prediction markets, by contrast, corrected faster as new information arrived — sometimes within hours of a news event.</p>
+        <div class="callout">The paper's most striking finding: expert forecasters were most wrong on the events they were most confident about. Prediction markets showed no such correlation between confidence and accuracy.</div>
+        <h2>The mechanism</h2>
+        <p>This isn't magic — it's incentives. Experts face reputational risk for bold claims and career risk for being wrong publicly. Markets face financial loss for being wrong and financial gain for updating faster than others. The result is that markets aggregate information more efficiently, particularly at moments when conventional wisdom is most likely to be wrong.</p>
+      `
+    },
+    {
+      id: 'manifold-usd',
+      tag: 'Platform', tagClass: 'tag-p',
+      headline: 'Manifold Markets launches real-money USD bridge, opens to 14 new countries',
+      source: 'Manifold Blog', time: '9 hours ago',
+      featured: false,
+      body: `
+        <p>Manifold Markets, which has operated as a play-money prediction market since 2022, has announced a real-money USD bridge that allows users to convert their Mana (M$) winnings into actual dollars at a fixed rate. The feature is launching in 14 countries, with the US and EU excluded pending regulatory review.</p>
+        <h2>What changes with real money</h2>
+        <p>Manifold's key differentiator has always been the breadth and speed of market creation — anyone can create a market on anything, with essentially no listing requirements. The play-money model enabled this by removing regulatory friction. Real money changes the calculus significantly.</p>
+        <p>The conversion bridge is likely a test for user behavior: does real-money incentive improve forecasting accuracy? Manifold's research team has hinted at internal data suggesting yes, particularly for niche markets where specialist knowledge is rewarded.</p>
+        <div class="callout">The 14-country launch is strategically interesting — it includes Kenya, Nigeria, and India, markets where mobile money is dominant and traditional finance barriers are high. Manifold may be building a non-Western growth base before a potential US regulatory push.</div>
+      `
+    },
+    {
+      id: 'fed-cut',
+      tag: 'Markets', tagClass: 'tag-c',
+      headline: 'Fed cut odds drop from 58% to 41% in 90 minutes after hot jobs report',
+      source: 'Oracle', time: '12 hours ago',
+      featured: false,
+      body: `
+        <p>This morning's non-farm payrolls print came in at 303,000 — well above the 214,000 consensus estimate — and the prediction markets responded immediately. The Kalshi "Fed cuts at March FOMC" contract dropped from 58% to 41% in under 90 minutes. That's a $4.2M swing in implied value.</p>
+        <h2>How fast is fast?</h2>
+        <p>For context: the Bloomberg consensus estimate barely moved in the same window. The Fed funds futures market (a much larger, more liquid market) took closer to 4 hours to fully reprice. Prediction markets, despite lower liquidity, moved first and moved correctly — a recurring pattern on high-frequency economic data releases.</p>
+        <div class="callout">The speed gap is closing between prediction markets and traditional derivatives. When Kalshi's volumes cross $1B in a single contract category, expect institutional desks to start using prediction market prices as leading indicators rather than lagging ones.</div>
+        <h2>What this means for March</h2>
+        <p>At 41%, the crowd now thinks a March cut is a coin flip that favors no action. The next major data point is CPI on March 12. If inflation comes in above 3.5%, expect the contract to drop toward 25%. Below 3.0% could push it back above 55%. The market is essentially a real-time CPI probability machine right now.</p>
+      `
+    }
+  ],
+
+  lessons: [
+    {
+      id: 'what-are-prediction-markets',
+      num: '01 — Beginner',
+      title: 'What are prediction markets?',
+      desc: 'How crowd wisdom becomes probability. The mechanics of YES/NO shares and why markets outperform polls.',
+      readTime: '5 min read',
+      body: `
+        <p>A prediction market is a trading venue where the commodity being bought and sold is the probability of a future event. Instead of trading stocks in a company, you're trading claims about whether something will happen.</p>
+        <h2>The basic mechanism</h2>
+        <p>Every market resolves to either YES (1) or NO (0). If you buy a YES share at $0.73, you're paying 73 cents for a contract that pays $1 if the event happens and $0 if it doesn't. The market price of that share — in this case, 73 cents — is the crowd's implied probability: 73%.</p>
+        <div class="callout">The price IS the probability. If a contract trades at $0.60, the market believes there's a 60% chance the event occurs. This is the core insight of prediction markets — prices aggregate information from all participants into a single number.</div>
+        <h2>Why they beat polls</h2>
+        <p>A poll asks people what they think. A prediction market asks people to stake money on what they think. That financial stake changes behavior in two important ways: people research before betting, and people update quickly when new information arrives because holding a wrong position is costly.</p>
+        <p>This is why Philip Tetlock's research on forecasting consistently finds that markets outperform expert panels. Experts can hold wrong views indefinitely without consequence. Market participants cannot.</p>
+        <h2>Where the money comes from</h2>
+        <p>On Polymarket, you trade USDC (a dollar-pegged stablecoin) on a smart contract on the Polygon blockchain. On Kalshi, you trade actual US dollars in a CFTC-regulated account. The difference matters for who can participate and what legal protections you have — but the underlying probability mechanism is identical.</p>
+      `
+    },
+    {
+      id: 'amms-vs-order-books',
+      num: '02 — Intermediate',
+      title: 'AMMs vs order books',
+      desc: 'How Polymarket\'s automated market maker differs from Kalshi\'s model and what it means for price efficiency.',
+      readTime: '12 min read',
+      body: `
+        <p>Two fundamentally different systems power today's largest prediction markets. Polymarket runs on an Automated Market Maker (AMM). Kalshi runs a Central Limit Order Book (CLOB). The difference shapes everything: liquidity, spreads, price discovery speed, and who can profitably trade.</p>
+        <h2>How an AMM works</h2>
+        <p>An AMM uses a mathematical formula to set prices automatically. In Polymarket's case, the CLOB model (they actually migrated from pure AMM in 2023) uses a constant product formula adapted for binary outcomes. The key property: you can always trade, but the price moves against you as your order size grows. Large orders move the market more.</p>
+        <p>This creates a predictable liquidity profile. Liquidity providers deposit both YES and NO shares into a pool and earn fees from trading activity. They don't need to be active — the contract prices them automatically.</p>
+        <h2>How an order book works</h2>
+        <p>Kalshi's CLOB is more similar to a stock exchange. Buyers post bids ("I'll pay $0.40 for YES"), sellers post asks ("I'll sell YES for $0.42"), and the exchange matches them when prices cross. There's no automatic price — the market price is simply the last trade price.</p>
+        <div class="callout">Order books require active market makers to maintain liquidity. During high-volatility events (like a surprise jobs number), order books can experience "liquidity gaps" where spreads widen dramatically. AMMs don't gap — they just move the price along the curve.</div>
+        <h2>What this means for you</h2>
+        <p>For small trades: AMMs are usually better. The spread is predictable and you execute immediately. For large trades (>$50k notional): order books are usually better if there's deep liquidity, because you won't move the price curve. For fast-moving events: order books update faster because they rely on human market makers who can reprice in milliseconds based on news, whereas AMM prices change only when someone trades against the pool.</p>
+      `
+    },
+    {
+      id: 'cross-platform-arbitrage',
+      num: '03 — Advanced',
+      title: 'Cross-platform arbitrage',
+      desc: 'When Polymarket and Kalshi disagree on the same event, that\'s an opportunity. How to find and execute it.',
+      readTime: '20 min read',
+      body: `
+        <p>Cross-platform arbitrage in prediction markets is the practice of simultaneously buying YES on one platform and NO on another for the same event when the combined cost is below $1. If both positions pay out at $1 on resolution, you lock in a risk-free profit equal to the spread.</p>
+        <h2>A real example</h2>
+        <p>Suppose Polymarket has "Fed cuts in March" at 58% (YES costs $0.58) and Kalshi has the same event at 47% (NO costs $0.53). Buy YES on Polymarket for $0.58, buy NO on Kalshi for $0.53. Total cost: $1.11. Wait — that's more than $1. That's not arbitrage, that's a guaranteed loss.</p>
+        <p>Flip it: Polymarket at 42% (YES at $0.42) and Kalshi at 55% (NO at $0.45). Buy YES on Polymarket + NO on Kalshi: $0.87 total. One of them pays $1. Profit: $0.13 per dollar, or ~15% return on the trade, risk-free on resolution.</p>
+        <div class="callout">The catch: "risk-free" assumes both markets resolve the same way, on the same event definition. Always read the resolution criteria carefully. Polymarket and Kalshi can list contracts on superficially similar events with meaningfully different resolution rules.</div>
+        <h2>Why gaps exist</h2>
+        <p>Gaps arise because the platforms have different user bases, different liquidity depths, and different information flows. Kalshi's US-only user base skews toward macro traders. Polymarket's global user base includes crypto-native participants with different macro priors. When a data release hits, these audiences don't update at the same speed.</p>
+        <h2>Execution constraints</h2>
+        <p>The main friction is capital lockup. Both legs of the trade need to be funded simultaneously, and capital is locked until resolution (which could be months). Factor in: Polymarket's 2% winning fee, Kalshi's per-contract fee, and the opportunity cost of locked capital. After fees, most apparent arbitrage opportunities are 2–8% — real, but not infinite money.</p>
+      `
+    }
+  ]
+
+};
+
+
+// ══════════════════════════════════════════════════
+// RENDERERS — build HTML from CONTENT data
+// ══════════════════════════════════════════════════
+
+function renderNewsGrid() {
+  const grid = document.getElementById('news-grid');
+  grid.innerHTML = CONTENT.posts.map(p => `
+    <a class="news-card${p.featured ? ' featured' : ''}" href="#post/${p.id}">
+      <div class="news-tag ${p.tagClass}">${p.tag}</div>
+      <div class="news-headline">${p.headline}</div>
+      <div class="news-meta">${p.source} · ${p.time}</div>
+    </a>
+  `).join('');
+}
+
+function renderEduGrid() {
+  const grid = document.getElementById('edu-grid');
+  grid.innerHTML = CONTENT.lessons.map(l => `
+    <a class="edu-card" href="#lesson/${l.id}">
+      <div class="edu-num">${l.num}</div>
+      <div class="edu-title">${l.title}</div>
+      <div class="edu-desc">${l.desc}</div>
+      <div class="edu-level">${l.readTime} →</div>
+    </a>
+  `).join('');
+}
+
+function showPost(id) {
+  const post = CONTENT.posts.find(p => p.id === id);
+  if (!post) return;
+  document.getElementById('article-content').innerHTML = `
+    <div class="article-tag news-tag ${post.tagClass}">${post.tag}</div>
+    <h1 class="article-headline">${post.headline}</h1>
+    <div class="article-meta-line">${post.source} · ${post.time}</div>
+    <div class="article-body">${post.body}</div>
+  `;
+  document.getElementById('blog-view').scrollTop = 0;
+}
+
+function showLesson(id) {
+  const lesson = CONTENT.lessons.find(l => l.id === id);
+  if (!lesson) return;
+  document.getElementById('lesson-content').innerHTML = `
+    <div class="edu-num" style="margin-bottom:16px">${lesson.num}</div>
+    <h1 class="article-headline">${lesson.title}</h1>
+    <div class="article-meta-line">${lesson.readTime}</div>
+    <div class="article-body">${lesson.body}</div>
+  `;
+  document.getElementById('learn-view').scrollTop = 0;
+}
+
+
+// ══════════════════════════════════════════════════
+// ROUTER — controls which view is visible
+// ══════════════════════════════════════════════════
+
+function navigate(hash) {
+  const main         = document.getElementById('main-view');
+  const blogView     = document.getElementById('blog-view');
+  const learnView    = document.getElementById('learn-view');
+  const newsletterView = document.getElementById('newsletter-view');
+  const allPages     = [blogView, learnView, newsletterView];
+
+  // Parse "#post/btc-150k" → route="post", id="btc-150k"
+  const parts = (hash || '').replace('#', '').split('/');
+  const route = parts[0];
+  const id    = parts[1];
+
+  // Hide all secondary views by default
+  allPages.forEach(v => v.classList.remove('active'));
+
+  if (route === 'post' && id) {
+    main.classList.add('hidden');
+    showPost(id);
+    blogView.classList.add('active');
+    window.scrollTo(0, 0);
+  } else if (route === 'lesson' && id) {
+    main.classList.add('hidden');
+    showLesson(id);
+    learnView.classList.add('active');
+    window.scrollTo(0, 0);
+  } else if (route === 'newsletter') {
+    main.classList.add('hidden');
+    newsletterView.classList.add('active');
+    window.scrollTo(0, 0);
+  } else {
+    // Section anchors (#markets, #news, #learn, #platforms) or root
+    main.classList.remove('hidden');
+    if (route) {
+      const el = document.getElementById(route);
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 50);
+    }
+    // Sync nav active state
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === hash);
+    });
+  }
+}
+
+window.addEventListener('hashchange', () => navigate(location.hash));
+
+// Newsletter form submit
+document.getElementById('nl-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  document.getElementById('nl-success').style.display = 'block';
+  document.getElementById('nl-email').value = '';
+});
+
+// Intersection observer for scroll reveals
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── INIT ──────────────────────────────────────────
+renderNewsGrid();
+renderEduGrid();
+navigate(location.hash);
+</script>
+</body>
+</html>
