@@ -17,6 +17,7 @@ export const LessonSchema = z.object({
   title: z.string(),
   desc: z.string(),
   readTime: z.string(),
+  difficulty: z.enum(['Beginner', 'Intermediate', 'Advanced']),
   body: z.string(),
 });
 
@@ -106,10 +107,11 @@ export const posts: Post[] = z.array(PostSchema).parse([
 export const lessons: Lesson[] = z.array(LessonSchema).parse([
   {
     id: 'what-are-prediction-markets',
-    num: '01 — Beginner',
+    num: '01',
     title: 'What are prediction markets?',
     desc: 'How crowd wisdom becomes probability. The mechanics of YES/NO shares and why markets outperform polls.',
     readTime: '5 min read',
+    difficulty: 'Beginner',
     body: `
       <p>A prediction market is a trading venue where the commodity being bought and sold is the probability of a future event. Instead of trading stocks in a company, you're trading claims about whether something will happen.</p>
       <h2>The basic mechanism</h2>
@@ -124,10 +126,11 @@ export const lessons: Lesson[] = z.array(LessonSchema).parse([
   },
   {
     id: 'amms-vs-order-books',
-    num: '02 — Intermediate',
+    num: '02',
     title: 'AMMs vs order books',
     desc: "How Polymarket's automated market maker differs from Kalshi's model and what it means for price efficiency.",
     readTime: '12 min read',
+    difficulty: 'Intermediate',
     body: `
       <p>Two fundamentally different systems power today's largest prediction markets. Polymarket runs on an Automated Market Maker (AMM). Kalshi runs a Central Limit Order Book (CLOB). The difference shapes everything: liquidity, spreads, price discovery speed, and who can profitably trade.</p>
       <h2>How an AMM works</h2>
@@ -142,10 +145,11 @@ export const lessons: Lesson[] = z.array(LessonSchema).parse([
   },
   {
     id: 'cross-platform-arbitrage',
-    num: '03 — Advanced',
+    num: '03',
     title: 'Cross-platform arbitrage',
     desc: "When Polymarket and Kalshi disagree on the same event, that's an opportunity. How to find and execute it.",
     readTime: '20 min read',
+    difficulty: 'Advanced',
     body: `
       <p>Cross-platform arbitrage in prediction markets is the practice of simultaneously buying YES on one platform and NO on another for the same event when the combined cost is below $1. If both positions pay out at $1 on resolution, you lock in a risk-free profit equal to the spread.</p>
       <h2>A real example</h2>
