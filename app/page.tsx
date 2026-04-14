@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { posts, lessons } from '@/data/content';
 import NewsGrid from '@/components/NewsGrid';
 import EduGrid from '@/components/EduGrid';
+import MarketList from '@/components/MarketList';
+
+export const revalidate = 60; // revalidate this page every 60 seconds
 
 export default function Home() {
   return (
@@ -9,9 +12,9 @@ export default function Home() {
       {/* HERO */}
       <div className="hero">
         <p className="hero-kicker">Prediction Market Intelligence</p>
-        <h1>What does the<br />crowd <em>believe</em>?</h1>
+        <h1>Map the signal.<br />Shape the <em>future.</em></h1>
         <p className="hero-sub">
-          Real-time odds, news, and education across every major prediction market — from Polymarket to Kalshi.
+          Live odds, signals, and education across every major prediction market — Polymarket, Kalshi, and beyond.
         </p>
         <div className="hero-actions">
           <Link href="/#markets" className="btn-dark">Explore markets</Link>
@@ -40,65 +43,13 @@ export default function Home() {
 
       {/* MARKETS */}
       <div className="section" id="markets">
-        <div className="section-label">Live markets</div>
-        <div className="market-header-row">
-          <span>Question</span>
-          <span className="col-right">Platform</span>
-          <span className="col-right">Probability</span>
-          <span className="col-right">7d</span>
-        </div>
-        <div className="market-list">
-          <a className="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
-            <div>
-              <div className="market-row-title">Will Bitcoin exceed $150,000 before end of 2025?</div>
-              <div className="market-platform-tag">$28.4M volume</div>
-            </div>
-            <div className="market-vol">Polymarket · Crypto</div>
-            <div className="market-prob prob-yes">73%</div>
-            <div className="market-trend trend-up">↑ +4.8%</div>
-          </a>
-          <a className="market-row" href="https://kalshi.com" target="_blank" rel="noopener">
-            <div>
-              <div className="market-row-title">Will the Fed cut rates at the March 2025 FOMC meeting?</div>
-              <div className="market-platform-tag">$6.1M volume</div>
-            </div>
-            <div className="market-vol">Kalshi · Macro</div>
-            <div className="market-prob prob-no">41%</div>
-            <div className="market-trend trend-dn">↓ −17%</div>
-          </a>
-          <a className="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
-            <div>
-              <div className="market-row-title">Will GPT-5 be released before July 2025?</div>
-              <div className="market-platform-tag">$3.8M volume</div>
-            </div>
-            <div className="market-vol">Polymarket · AI</div>
-            <div className="market-prob prob-yes">67%</div>
-            <div className="market-trend trend-up">↑ +5.3%</div>
-          </a>
-          <a className="market-row" href="https://polymarket.com" target="_blank" rel="noopener">
-            <div>
-              <div className="market-row-title">Will there be a Gaza ceasefire agreement before June 2025?</div>
-              <div className="market-platform-tag">$9.7M volume</div>
-            </div>
-            <div className="market-vol">Polymarket · Geopolitics</div>
-            <div className="market-prob prob-yes">54%</div>
-            <div className="market-trend trend-up">↑ +2.1%</div>
-          </a>
-          <a className="market-row" href="https://kalshi.com" target="_blank" rel="noopener">
-            <div>
-              <div className="market-row-title">Will US CPI exceed 4% YoY in any month of 2025?</div>
-              <div className="market-platform-tag">$2.2M volume</div>
-            </div>
-            <div className="market-vol">Kalshi · Economy</div>
-            <div className="market-prob prob-no">22%</div>
-            <div className="market-trend trend-dn">↓ −1.2%</div>
-          </a>
-        </div>
+        <div className="section-label">Live market signals</div>
+        <MarketList />
       </div>
 
       {/* NEWS */}
       <div className="section" id="news">
-        <div className="section-label">Latest intelligence</div>
+        <div className="section-label">Latest signals</div>
         <NewsGrid posts={posts} />
       </div>
 

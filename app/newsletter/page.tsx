@@ -1,39 +1,51 @@
 'use client';
 
 import { useState } from 'react';
-import { z } from 'zod';
-
-const EmailSchema = z.object({
-  email: z.email('Please enter a valid email address'),
-});
 
 export default function NewsletterPage() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const result = EmailSchema.safeParse({ email });
-    if (!result.success) {
-      setError(result.error.issues[0].message);
-      return;
-    }
     setError('');
-    setSubmitted(true);
-    setEmail('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? 'Something went wrong. Please try again.');
+        return;
+      }
+
+      setSubmitted(true);
+      setEmail('');
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="newsletter-container">
       <div className="nl-label">Weekly intelligence</div>
-      <h1 className="nl-title">The Oracle<br /><em>Briefing</em></h1>
+      <h1 className="nl-title">The Frontier<br /><em>Briefing</em></h1>
       <p className="nl-desc">
         Every Monday: the most important prediction market moves, the signal behind the noise, and one deep-dive into a market that deserves attention.
       </p>
 
       {submitted ? (
-        <div className="nl-success">You're in. First issue lands Monday.</div>
+        <div className="nl-success">You&apos;re in. First issue lands Monday.</div>
       ) : (
         <form className="nl-form" onSubmit={handleSubmit}>
           <input
@@ -43,8 +55,11 @@ export default function NewsletterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
-          <button className="nl-btn" type="submit">Subscribe</button>
+          <button className="nl-btn" type="submit" disabled={loading}>
+            {loading ? 'Subscribing…' : 'Subscribe'}
+          </button>
         </form>
       )}
 
@@ -53,7 +68,7 @@ export default function NewsletterPage() {
       <div className="nl-perks">
         <div className="nl-perk">
           <div className="nl-perk-title">Market moves</div>
-          <div className="nl-perk-desc">The week's biggest probability shifts, explained with context, not just the number.</div>
+          <div className="nl-perk-desc">The week&apos;s biggest probability shifts, explained with context, not just the number.</div>
         </div>
         <div className="nl-perk">
           <div className="nl-perk-title">Deep dive</div>
