@@ -37,6 +37,11 @@ export default function LessonPage({ params }: { params: { id: string } }) {
       </div>
       <div className="article-container">
         <div className="edu-num" style={{ marginBottom: '16px' }}>{lesson.num}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--orange)', opacity: '0.8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            {lesson.difficulty}
+          </span>
+        </div>
         <h1 className="article-headline">{lesson.title}</h1>
         <div className="article-meta-line">{lesson.readTime}</div>
         <div
